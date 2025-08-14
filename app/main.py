@@ -8,7 +8,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from datetime import datetime, date, timedelta
 from app.models import Patient, PatientExtra, Consulta, Ajustes, RecetaItem, Medicine, Dosificacion, Appointment, RecetaHistory
 from app.routers.appointments import make_router
-from app.routers.recetas import make_router as make_recetas_router
 import json, os
 
 DATABASE_URL = "sqlite:///./data.db"
@@ -16,7 +15,6 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 app = FastAPI(title="Expediente Médico 1.3.0 (calibrated)")
 app.include_router(make_router(engine))
-app.include_router(make_recetas_router(engine))
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 env = Environment(loader=FileSystemLoader("app/templates"), autoescape=select_autoescape())
@@ -155,7 +153,10 @@ def paciente_detalle(pid: int, request: Request, session: Session = Depends(get_
         today = datetime.today().date()
         edad_calc = today.year - extra.fecha_nacimiento.year - ((today.month, today.day) < (extra.fecha_nacimiento.month, extra.fecha_nacimiento.day))
     app_list = (extra.app.split(",") if extra and extra.app else [])
-    return render("patient_detail.html", request=request, p=paciente, extra=extra, edad_calc=edad_calc, app_list=app_list)
+        # Última consulta del paciente (para amarrar receta rápida)
+    _ultima = session.exec(select(Consulta).where(Consulta.patient_id==pid).order_by(Consulta.fecha.desc())).first()
+    ultima_consulta_id = _ultima.id if _ultima else None
+    return render("patient_detail.html", request=request, p=paciente, extra=extra, edad_calc=edad_calc, app_list=app_list, ultima_consulta_id=ultima_consulta_id)
 
 @app.post("/consulta/guardar")
 def consulta_guardar(

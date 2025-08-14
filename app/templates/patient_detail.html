@@ -25,7 +25,7 @@
         <label>Talla<input name="talla" value="1.70 m"></label>
       </div>
       <button class="primary">Guardar consulta</button>
-      <a class="button" href="/receta/nueva/{{ p.id }}">Receta rápida →</a>
+      <a class="button" href="/receta/nueva/{{ p.id }}{% if ultima_consulta_id %}?consulta_id={{ ultima_consulta_id }}{% endif %}">Receta rápida →</a>
     </div>
     <div>
       <label>Padecimiento actual<textarea name="padecimiento_actual" rows="3"></textarea></label>
