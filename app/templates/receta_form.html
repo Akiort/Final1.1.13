@@ -5,7 +5,7 @@
 <h1>Receta para {{ p.nombre }}</h1>
 <datalist id="meds">{% for m in med_sugeridos %}<option value="{{ m.nombre }}">{% endfor %}</datalist>
 <datalist id="dosif">{% for d in dosif_sugeridas %}<option value="{{ d.texto }}">{% endfor %}</datalist>
-<form method="post" class="form" onsubmit="syncItems();">
+<form method="post" class="form" id="form-receta" onsubmit="syncItems();">
   <input type="hidden" name="patient_id" value="{{ p.id }}">
   <input type="hidden" name="consulta_id" value="{{ consulta_id or '' }}">
   <label>Fecha<input type="date" name="fecha" id="rx_fecha" value="{{ hoy.strftime('%Y-%m-%d') }}"></label>
@@ -95,12 +95,7 @@
   <input type="hidden" id="items_json" name="items_json">
   <input type="hidden" id="proxima_cita" name="proxima_cita">
   
-  <div class="hstack buttons-row">
-    <button class="primary" type="submit" formaction="/receta/preview">Vista previa</button>
-    <button type="button" class="primary" id="btn-guardar-cita">Guardar cita</button>
-    <button type="button" class="primary" id="btn-guardar-receta">Guardar receta</button>
-  </div>
-  <p id="link-consulta-previa" class="hidden muted"></p>
+  
     
 </form><!-- VISTA_PREVIA_UNICA -->
   
@@ -120,5 +115,13 @@
 
   <p id="cita_msg" class="small"></p>
 </div>
+
+<div class="hstack buttons-row">
+    <button class="primary" type="submit" form="form-receta" formaction="/receta/preview">Vista previa</button>
+    <button type="button" class="primary" id="btn-guardar-cita">Guardar cita</button>
+    <button type="button" class="primary" id="btn-guardar-receta">Guardar receta</button>
+  </div>
+  <p id="link-consulta-previa" class="hidden muted"></p>
+
 
 {% endblock %}
