@@ -155,7 +155,10 @@ def paciente_detalle(pid: int, request: Request, session: Session = Depends(get_
         today = datetime.today().date()
         edad_calc = today.year - extra.fecha_nacimiento.year - ((today.month, today.day) < (extra.fecha_nacimiento.month, extra.fecha_nacimiento.day))
     app_list = (extra.app.split(",") if extra and extra.app else [])
-    return render("patient_detail.html", request=request, p=paciente, extra=extra, edad_calc=edad_calc, app_list=app_list)
+    # Última consulta para enlazar receta rápida
+_ultima = session.exec(select(Consulta).where(Consulta.patient_id==pid).order_by(Consulta.fecha.desc())).first()
+ultima_consulta_id = _ultima.id if _ultima else None
+return render("patient_detail.html", request=request, p=paciente, extra=extra, edad_calc=edad_calc, app_list=app_list, ultima_consulta_id=ultima_consulta_id)
 
 @app.post("/consulta/guardar")
 def consulta_guardar(
