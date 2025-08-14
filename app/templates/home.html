@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h1>Expediente (inicio)</h1>
+
+<section class="card">
+  <div class="hstack" style="justify-content:space-between; align-items:center;">
+    <h2>Citas — {{ hoy }}</h2>
+    <form method="get" action="/expediente" class="hstack" style="gap:8px;">
+      <a class="button" href="/expediente?fecha={{ prev_day }}">← Día anterior</a>
+      <input type="date" name="fecha" value="{{ sel }}">
+      <button class="button" type="submit">Ir</button>
+      <a class="button" href="/expediente?fecha={{ next_day }}">Día siguiente →</a>
+    </form>
+  </div>
+  {% if citas and citas|length > 0 %}
+  <table class="table">
+    <thead><tr><th>Hora</th><th>Paciente</th><th>Teléfono</th><th>Notas</th></tr></thead>
+    <tbody>
+      {% for c in citas %}
+      <tr>
+        <td>{{ c.hora }}</td>
+        <td>{% if c.pid %}<a href="/paciente/{{ c.pid }}">{{ c.paciente }}</a>{% else %}{{ c.paciente }}{% endif %}</td>
+        <td>{{ c.telefono }}</td>
+        <td>{{ c.notas }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No hay citas registradas para este día.</p>
+  {% endif %}
+</section>
+
+<form method="get" action="/expediente" class="form">
+  <label>Buscar pacientes
+    <input type="text" name="q" placeholder="Nombre o diagnóstico" value="{{ q }}">
+  </label>
+</form>
+{% if pacientes %}
+<table class="table">
+  <thead><tr><th>Nombre</th><th>Edad</th><th>Sexo</th><th>Alergias</th><th>Consultas</th></tr></thead>
+  <tbody>
+  {% for p in pacientes %}
+    <tr>
+      <td><a href="/paciente/{{ p.id }}">{{ p.nombre }}</a></td>
+      <td>{{ p.edad or '—' }}</td>
+      <td>{{ p.sexo or '—' }}</td>
+      <td>{{ p.alergias or '—' }}</td>
+      <td>{{ p.consultas|length }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Aún no hay pacientes.</p>
+{% endif %}
+{% endblock %}

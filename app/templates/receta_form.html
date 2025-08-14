@@ -1,0 +1,124 @@
+
+{% extends "base.html" %}
+{% block content %}
+<a href="/paciente/{{ p.id }}" class="muted">← Volver al paciente</a>
+<h1>Receta para {{ p.nombre }}</h1>
+<datalist id="meds">{% for m in med_sugeridos %}<option value="{{ m.nombre }}">{% endfor %}</datalist>
+<datalist id="dosif">{% for d in dosif_sugeridas %}<option value="{{ d.texto }}">{% endfor %}</datalist>
+<form method="post" class="form" onsubmit="syncItems();">
+  <input type="hidden" name="patient_id" value="{{ p.id }}">
+  <input type="hidden" name="consulta_id" value="{{ consulta_id or '' }}">
+  <label>Fecha<input type="date" name="fecha" id="rx_fecha" value="{{ hoy.strftime('%Y-%m-%d') }}"></label>
+  
+  <div id="items">
+    <div class="item">
+      <label>Medicamento
+        <input type="text" class="nombre" list="meds">
+      </label>
+      <label>Indicaciones
+        <textarea class="indicacion" rows="2" placeholder="Escribe indicaciones y dosis, una por renglón"></textarea>
+        <input list="dosif" placeholder="Sugerencias de dosificación" oninput="if(this.value){const ta=this.previousElementSibling; ta.value = (ta.value? ta.value+'\n':'') + this.value; this.value='';}">
+      </label>
+    </div>
+  </div>
+<button type="button" id="btn-add-medicamento">+ Agregar medicamento</button>
+  <script>
+// FIX_MEDICAMENTO (limpio) — clona .item y prepara items_json para el submit
+(function(){
+  "use strict";
+
+  function addItem(){
+    var wrap = document.getElementById("items");
+    if (!wrap) return;
+    var first = wrap.querySelector(".item");
+    if (!first) return;
+
+    var clone = first.cloneNode(true);
+
+    // Limpia inputs/textarea/select visibles (no hidden)
+    clone.querySelectorAll("input, textarea, select").forEach(function(el){
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else if (el.type !== "hidden") el.value = "";
+    });
+
+    wrap.appendChild(clone);
+  }
+
+  // Recolecta cada .item en {nombre, indicacion} y lo mete a #items_json
+  function syncItems(){
+    try{
+      var out = [];
+      var wrap = document.getElementById("items");
+      if (wrap){
+        var items = wrap.querySelectorAll(".item");
+        items.forEach(function(block){
+          // Primer input = nombre; primer textarea = indicacion
+          var nombreEl = block.querySelector("input");
+          var indicEl  = block.querySelector("textarea");
+          var nombre = nombreEl ? (nombreEl.value || "").trim() : "";
+          var indic  = indicEl  ? (indicEl.value  || "").trim() : "";
+          if (nombre || indic) out.push({ nombre: nombre, indicacion: indic });
+        });
+      }
+      var hidden = document.getElementById("items_json");
+      if (hidden) hidden.value = JSON.stringify(out);
+    }catch(_e){}
+    return true; // permite que el submit continúe
+  }
+
+  // Exponer global para onsubmit u otros scripts
+  window.addItem = addItem;
+  window.syncItems = syncItems;
+
+  // Enlazar botón por id (sin onclick inline)
+  function bind(){
+    var btn = document.getElementById("btn-add-medicamento");
+    if (btn && !btn.dataset._hooked){
+      btn.addEventListener("click", addItem);
+      btn.dataset._hooked = "1";
+    }
+  }
+  if (document.readyState !== "loading") bind();
+  else document.addEventListener("DOMContentLoaded", bind);
+})();
+</script>
+
+
+
+  <details class="card">
+    <summary style="cursor:pointer;"><strong>Recomendaciones</strong> <span class="small">(opcional)</span></summary>
+    <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:8px;">
+      {% for r in recoms %}<label><input type="checkbox" onchange="toggleRecom(this)"> {{ r }}</label>{% endfor %}
+    </div>
+    <label>Recomendaciones (texto libre)<textarea name="recomendaciones" id="recomendaciones" rows="2"></textarea></label>
+  </details>
+  <input type="hidden" id="items_json" name="items_json">
+  <input type="hidden" id="proxima_cita" name="proxima_cita">
+  
+  <div class="hstack buttons-row">
+    <button class="primary" type="submit" formaction="/receta/preview">Vista previa</button>
+    <button type="button" class="primary" id="btn-guardar-cita">Guardar cita</button>
+    <button type="button" class="primary" id="btn-guardar-receta">Guardar receta</button>
+  </div>
+  <p id="link-consulta-previa" class="hidden muted"></p>
+    
+</form><!-- VISTA_PREVIA_UNICA -->
+  
+  <div class="card">
+  <h3>Próxima cita</h3>
+
+  <!-- ⬇️ NUEVO: form con IDs y names correctos -->
+  <form id="form-cita" onsubmit="return false;">
+    <input type="hidden" name="patient_id" value="{{ p.id }}">
+    <input type="hidden" name="consulta_id" value="{{ consulta_id or '' }}">
+
+    <label>Fecha y hora
+      <!-- ⬇️ IMPORTANTE: name="fecha" e id estándar -->
+      <input type="datetime-local" name="fecha" id="cita_fecha">
+    </label>
+  </form>
+
+  <p id="cita_msg" class="small"></p>
+</div>
+
+{% endblock %}

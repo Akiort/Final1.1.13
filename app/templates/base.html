@@ -1,0 +1,39 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or 'Expediente' }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.receta_patch.css">
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <meta name="theme-color" content="#ff8a1a">
+</head>
+<body>
+<div class="bg-watermark"></div>
+<header class="topbar">
+  <div class="wrap navwrap">
+    <div class="brandwrap">
+      <img src="/static/logo-header.png" alt="JR" class="brand-logo">
+      <a class="brand" href="/expediente">Expediente</a>
+    </div>
+    <nav class="navlinks">
+      <a href="/">Inicio</a>
+      <a href="/ajustes">Ajustes</a>
+      <a class="primary" href="/paciente/nuevo">+ Nuevo expediente</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  {% block content %}{% endblock %}
+</main>
+<footer class="wrap muted">
+  <p>Expediente Médico — PWA</p>
+</footer>
+  <script src="/static/patch.receta.js" defer></script>
+<script src="/static/patch.js"></script>
+</body>
+</html>

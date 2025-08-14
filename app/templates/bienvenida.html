@@ -1,0 +1,14 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="splash">
+  <div class="splash-card">
+    <img src="/static/logo-header.png" alt="Logo JR" class="splash-logo">
+    <h1>{{ ajustes.medico_nombre or 'Dr./Dra.' }}</h1>
+    <p class="muted">{{ ajustes.clinica_nombre or '' }}</p>
+    <p class="muted">{{ ajustes.clinica_direccion or '' }}</p>
+    <p class="muted">Tel. {{ ajustes.clinica_telefono or '' }}</p>
+    <p class="muted">Cédula {{ ajustes.cedula or '' }}{% if ajustes.cedula_especialista %} • Céd. Esp. {{ ajustes.cedula_especialista }}{% endif %}</p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h1>Nuevo expediente</h1>
+<form action="/paciente/guardar" method="post" class="form">
+  <label>Nombre<input name="nombre" required></label>
+  <div class="grid">
+    <label>Fecha de nacimiento<input type="date" name="fecha_nacimiento" id="fnac" onchange="calcEdad()"></label>
+    <label>Edad<input name="edad" id="edad" type="number" min="0"></label>
+  </div>
+  <div class="grid">
+    <label>Sexo<select name="sexo"><option></option><option>F</option><option>M</option></select></label>
+    <label>Teléfono<input name="telefono"></label>
+  </div>
+  <label>Alergias<textarea name="alergias" rows="2"></textarea></label>
+  <details class="card">
+    <summary style="cursor:pointer;"><strong>Antecedentes personales patológicos</strong></summary>
+    <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:8px;">
+      {% for opt in ['Diabetes Mellitus','Hipertensión Arterial','Artritis Reumatoide','Infarto Agudo del Miocardio','Hipotiroidismo','Insuficiencia renal'] %}
+      <label><input type="checkbox" value="{{ opt }}" class="app-check"> {{ opt }}</label>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="app_sel" id="app_sel">
+  </details>
+  <label>Cirugías previas<textarea name="cirugias_previas" rows="2" placeholder="Procedimiento, fecha, lado, etc."></textarea></label>
+  <button class="primary" type="submit" onclick="syncApp()">Guardar</button>
+</form>
+<script>
+function calcEdad(){
+  const fn = document.getElementById('fnac').value;
+  if(!fn) return;
+  const d = new Date(fn); const t = new Date();
+  let e = t.getFullYear()-d.getFullYear();
+  const m = t.getMonth()-d.getMonth();
+  if(m<0 || (m===0 && t.getDate()<d.getDate())) e--;
+  document.getElementById('edad').value = e;
+}
+function syncApp(){
+  const checks = Array.from(document.querySelectorAll('.app-check')).filter(c=>c.checked).map(c=>c.value);
+  document.getElementById('app_sel').value = checks.join(',');
+}
+</script>
+{% endblock %}

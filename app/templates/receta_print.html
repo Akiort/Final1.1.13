@@ -1,0 +1,53 @@
+
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Receta {{ p.nombre }} {{ fecha }}</title>
+<style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:24px}.encabezado{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px}h1{font-size:18px;margin:0}.datos{font-size:14px}ol{font-size:16px}.firmas{margin-top:40px;display:flex;justify-content:space-between}.firma{text-align:center;width:48%}@media print{@page{size:A4;margin:18mm}.no-print{display:none}}</style>
+<script>window.onafterprint=function(){ window.location.href='/receta/nueva/{{ p.id }}'; }</script></head>
+<body>
+<div class="encabezado">
+  <div>
+    <h1>{{ ajustes.clinica_nombre or '' }}</h1>
+    <div class="datos">{{ ajustes.clinica_direccion or '' }}<br>{{ ajustes.clinica_telefono or '' }}</div>
+  </div>
+  <div class="datos">
+    <div><strong>Médico:</strong> {{ ajustes.medico_nombre or '' }}</div>
+    <div><strong>Cédula:</strong> {{ ajustes.cedula or '' }}</div>
+    <div><strong>Cédula Esp.:</strong> {{ ajustes.cedula_especialista or '' }}</div>
+    <div><strong>Fecha:</strong> {{ fecha }}</div>
+    <div><strong>Paciente:</strong> {{ p.nombre }}</div>
+  </div>
+</div>
+
+<ol>
+{% for it in items %}
+  <li><strong>{{ it.nombre }}</strong><br>{{ it.indicacion }}</li>
+{% endfor %}
+</ol>
+
+{% if recomendaciones %}
+<p><strong>Recomendaciones:</strong><br>{{ recomendaciones | replace('\n','<br>') | safe }}</p>
+{% endif %}
+
+{% if proxima_cita %}
+<p><strong>Próxima cita:</strong> {{ proxima_cita }}</p>
+{% endif %}
+
+<div class="firmas">
+  <div class="firma">
+    _______________________________<br>
+    {{ ajustes.medico_nombre or '' }}<br>
+    Cédula {{ ajustes.cedula or '' }} — Cédula Esp. {{ ajustes.cedula_especialista or '' }}
+  </div>
+  <div class="firma">
+    _______________________________<br>
+    {{ p.nombre }}
+  </div>
+</div>
+
+<p class="no-print"><button onclick="window.print()">Imprimir</button></p>
+<p class="no-print">
+  <a class="button" href="/receta/nueva/{{ p.id }}">Volver a recetas (no se borra)</a>
+  <a class="button" href="/">Terminar expediente</a>
+</p>
+</body></html>

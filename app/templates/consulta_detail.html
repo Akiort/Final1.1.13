@@ -1,0 +1,76 @@
+
+{% extends "base.html" %}
+{% block content %}
+<a href="/paciente/{{ p.id }}" class="muted">← Volver a paciente</a>
+<h1>Consulta del {{ c.fecha.strftime('%d/%m/%Y %H:%M') }}</h1>
+
+<div class="card">
+  {% set v = detalle.vitales %}
+  {% if v %}
+  <h3>Signos vitales</h3>
+  <p>TA: {{ v.TA or '—' }} • FC: {{ v.FC or '—' }} • FR: {{ v.FR or '—' }} • Peso: {{ v.Peso or '—' }} • Talla: {{ v.Talla or '—' }}</p>
+  {% endif %}
+  <p><strong>Padecimiento actual:</strong><br>{{ detalle.padecimiento_actual or '—' }}</p>
+  <p><strong>Exploración física:</strong><br>{{ detalle.exploracion_fisica or '—' }}</p>
+  <p><strong>Estudios complementarios:</strong><br>{{ detalle.estudios_complementarios or '—' }}</p>
+  <p><strong>Diagnósticos:</strong><br>{{ detalle.diagnosticos or '—' }}</p>
+  <p><strong>Plan de manejo:</strong><br>{{ detalle.plan_manejo or '—' }}</p>
+</div>
+
+<section class="card">
+  <h2>Receta de esta consulta</h2>
+  {% if detalle.receta and detalle.receta.items %}
+    <ol>
+    {% for it in detalle.receta.items %}
+      <li><strong>{{ it.nombre }}</strong><br>{{ it.indicacion | replace('\n','<br>') | safe }}</li>
+    {% endfor %}
+    </ol>
+    {% if detalle.receta.recomendaciones %}
+      <p><strong>Recomendaciones:</strong><br>{{ detalle.receta.recomendaciones | replace('\n','<br>') | safe }}</p>
+    {% endif %}
+    {% if detalle.receta.proxima_cita %}
+      <p><strong>Próxima cita:</strong> {{ detalle.receta.proxima_cita }}</p>
+    {% endif %}
+  {% else %}
+    <p class="muted">No hay receta asociada a esta consulta.</p>
+<a class="button" href="/receta/nueva/{{ p.id }}?consulta_id={{ c.id }}">Crear receta de esta consulta</a>
+  {% endif %}
+</section>
+
+{% if receta_de_consulta %}
+<section class="card">
+  
+<h3>Tratamiento indicado</h3>
+
+{% if detalle.tratamiento and detalle.tratamiento|length > 0 %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:35%;">Medicamento</th>
+        <th style="width:25%;">Dosis</th>
+        <th>Indicaciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in detalle.tratamiento %}
+      <tr>
+        <td><strong>{{ t.nombre }}</strong></td>
+        <td>{{ t.dosis }}</td>
+        <td style="white-space:pre-line;">{{ t.indicaciones }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if receta_de_consulta %}
+  <div class="hstack" style="gap:8px; margin-top:8px;">
+    <a class="button" href="/receta/history/{{ receta_de_consulta.id }}" target="_blank">Ver receta</a>
+    <a class="button" href="/receta/history/{{ receta_de_consulta.id }}/pdf" target="_blank">PDF</a>
+  </div>
+  {% endif %}
+{% else %}
+  <p class="muted">No hay tratamiento registrado vía receta para esta consulta.</p>
+  <a class="button" href="/receta/nueva/{{ p.id }}?consulta_id={{ c.id }}">Crear receta de esta consulta</a>
+{% endif %}
+</section>
+{% endif %}
+{% endblock %}

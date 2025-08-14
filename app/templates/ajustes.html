@@ -1,0 +1,18 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h1>Ajustes</h1>
+<form method="post" class="form">
+  <div class="grid">
+    <label>Nombre de la clínica<input name="clinica_nombre" value="{{ a.clinica_nombre or '' }}"></label>
+    <label>Teléfono<input name="clinica_telefono" value="{{ a.clinica_telefono or '' }}"></label>
+  </div>
+  <label>Dirección<textarea name="clinica_direccion" rows="2">{{ a.clinica_direccion or '' }}</textarea></label>
+  <div class="grid">
+    <label>Nombre del médico<input name="medico_nombre" value="{{ a.medico_nombre or '' }}"></label>
+    <label>Cédula<input name="cedula" value="{{ a.cedula or '' }}"></label>
+  </div>
+  <label>Cédula de especialista<input name="cedula_especialista" value="{{ a.cedula_especialista or '' }}"></label>
+  <button class="primary" type="submit">Guardar</button>
+</form>
+{% endblock %}

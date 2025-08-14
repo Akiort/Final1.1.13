@@ -1,0 +1,49 @@
+
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista previa — {{ p.nombre }}</title>
+<style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:24px} .encabezado{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:16px} h1{font-size:18px;margin:0} .datos{font-size:14px} ol{font-size:16px} .actions{margin-top:16px} .button{border:1px solid #ccc;border-radius:8px;padding:6px 10px;display:inline-block;text-decoration:none;color:#000}</style>
+</head><body>
+<div class="encabezado">
+  <div>
+    <h1>{{ ajustes.clinica_nombre or '' }}</h1>
+    <div class="datos">{{ ajustes.clinica_direccion or '' }}<br>{{ ajustes.clinica_telefono or '' }}</div>
+  </div>
+  <div class="datos">
+    <div><strong>Médico:</strong> {{ ajustes.medico_nombre or '' }}</div>
+    <div><strong>Cédula:</strong> {{ ajustes.cedula or '' }}</div>
+    <div><strong>Cédula Esp.:</strong> {{ ajustes.cedula_especialista or '' }}</div>
+    <div><strong>Fecha:</strong> {{ fecha }}</div>
+    <div><strong>Paciente:</strong> {{ p.nombre }}</div>
+  </div>
+</div>
+
+<ol>
+{% for it in items %}
+  <li><strong>{{ it.nombre }}</strong><br>{{ it.indicacion | replace('\n','<br>') | safe }}</li>
+{% endfor %}
+</ol>
+
+{% if recomendaciones %}
+<p><strong>Recomendaciones:</strong><br>{{ recomendaciones | replace('\n','<br>') | safe }}</p>
+{% endif %}
+
+{% if proxima_cita %}
+<p><strong>Próxima cita:</strong> {{ proxima_cita }}</p>
+{% endif %}
+
+<div class="actions">
+  <form method="post" action="/receta/pdf" target="_blank" style="display:inline;">
+    <input type="hidden" name="patient_id" value="{{ p.id }}">
+    {% if consulta_id %}<input type="hidden" name="consulta_id" value="{{ consulta_id }}">{% endif %}
+    <input type="hidden" name="fecha" value="{{ fecha }}">
+    <input type="hidden" name="items_json" value='{{ items|tojson }}'>
+    <input type="hidden" name="recomendaciones" value="{{ recomendaciones or '' }}">
+    <input type="hidden" name="proxima_cita" value="{{ proxima_cita or '' }}">
+    <button class="button" type="submit">Imprimir (PDF calibrado)</button>
+  </form>
+  <a class="button" href="javascript:history.back()">Volver a receta</a>
+  <a class="button" href="/">Terminar expediente</a>
+  
+</div>
+</body></html>
